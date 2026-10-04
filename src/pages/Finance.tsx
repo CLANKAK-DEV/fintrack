@@ -86,7 +86,7 @@ export function Finance() {
             <LedgerRow label="Remaining profit" value={money(ledger.remaining, { sign: true })} color={ledger.remaining >= 0 ? "var(--color-positive)" : "var(--color-negative)"} big />
           </div>
           <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-overlay)] px-3.5 py-3 text-xs text-[var(--color-muted)]">
-            A <b className="text-[var(--color-fg)]">withdrawal</b> (e.g. Wallet → Binance) moves earnings you already
+            A <b className="text-[var(--color-fg)]">withdrawal</b> (e.g. Checking → Savings) moves earnings you already
             counted. It reduces remaining profit but is <b className="text-[var(--color-fg)]">never</b> added as new income.
           </div>
         </Panel>

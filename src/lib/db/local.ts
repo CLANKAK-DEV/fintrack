@@ -6,7 +6,6 @@ import {
   type Subscription,
   type Task,
   type Transaction,
-  type Wallet,
 } from "./types";
 
 const KEY = "clankos:db:v1";
@@ -14,7 +13,6 @@ const KEY = "clankos:db:v1";
 function empty(): Snapshot {
   return {
     transactions: [],
-    wallets: [],
     subscriptions: [],
     tasks: [],
     settings: { ...DEFAULT_SETTINGS },
@@ -63,15 +61,6 @@ export class LocalDatabase implements Database {
   }
   async deleteTransaction(id: string) {
     this.cache.transactions = this.cache.transactions.filter((t) => t.id !== id);
-    this.flush();
-  }
-
-  async putWallet(w: Wallet) {
-    this.upsert(this.cache.wallets, w);
-    this.flush();
-  }
-  async deleteWallet(id: string) {
-    this.cache.wallets = this.cache.wallets.filter((x) => x.id !== id);
     this.flush();
   }
 

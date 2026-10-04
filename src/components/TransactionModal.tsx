@@ -55,8 +55,8 @@ export function TransactionModal({
       setCategory(defaultType === "expense" ? EXPENSE_CATEGORIES[0] : INCOME_CATEGORIES[0]);
       setDate(todayISO());
       setNote("");
-      setFromAccount(defaultType === "withdrawal" ? "Wallet A" : "");
-      setToAccount(defaultType === "withdrawal" ? "Binance" : "");
+      setFromAccount(defaultType === "withdrawal" ? "Checking" : "");
+      setToAccount(defaultType === "withdrawal" ? "Savings" : "");
     }
   }, [open, editing, defaultType]);
 
@@ -78,8 +78,8 @@ export function TransactionModal({
     else if (t === "expense") setCategory(EXPENSE_CATEGORIES[0]);
     else setCategory(TYPE_STYLES[t].label);
     if (MOVEMENT.includes(t) && !fromAccount) {
-      setFromAccount(t === "withdrawal" ? "Wallet A" : "");
-      setToAccount(t === "withdrawal" ? "Binance" : "");
+      setFromAccount(t === "withdrawal" ? "Checking" : "");
+      setToAccount(t === "withdrawal" ? "Savings" : "");
     }
   }
 
@@ -167,10 +167,10 @@ export function TransactionModal({
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-4">
           <Field label="From">
-            <TextInput value={fromAccount} onChange={(e) => setFromAccount(e.target.value)} placeholder="Wallet A" />
+            <TextInput value={fromAccount} onChange={(e) => setFromAccount(e.target.value)} placeholder="Checking" />
           </Field>
           <Field label="To">
-            <TextInput value={toAccount} onChange={(e) => setToAccount(e.target.value)} placeholder="Binance" />
+            <TextInput value={toAccount} onChange={(e) => setToAccount(e.target.value)} placeholder="Savings" />
           </Field>
         </div>
       )}

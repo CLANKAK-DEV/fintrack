@@ -17,22 +17,6 @@
     "sql:allow-load",
     "sql:allow-execute",
     "sql:allow-select",
-    "sql:allow-close",
-    {
-      "identifier": "http:default",
-      "allow": [
-        { "url": "https://ethereum-rpc.publicnode.com/" },
-        { "url": "https://solana-rpc.publicnode.com/" },
-        { "url": "https://eth.llamarpc.com/" },
-        { "url": "https://rpc.ankr.com/*" },
-        { "url": "https://blockstream.info/*" },
-        { "url": "https://mempool.space/*" },
-        { "url": "https://api.mainnet-beta.solana.com/" },
-        { "url": "https://api.coingecko.com/*" },
-        { "url": "https://*.g.alchemy.com/*" },
-        { "url": "https://robinhoodchain.blockscout.com/*" },
-        { "url": "https://rpc.mainnet.chain.robinhood.com/" }
-      ]
-    }
+    "sql:allow-close"
   ]
 }

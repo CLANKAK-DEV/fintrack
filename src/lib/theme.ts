@@ -49,10 +49,3 @@ export const CAT_COLORS = [
   C.warning,
   "#fb923c",
 ];
-
-export const CHAIN_COLORS: Record<string, string> = {
-  ETH: "#8b7cf6",
-  BTC: "#f7931a",
-  SOL: "#22d3ee",
-  OTHER: "#96a0b5",
-};

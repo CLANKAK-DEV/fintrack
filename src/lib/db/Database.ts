@@ -1,11 +1,4 @@
-import type {
-  Settings,
-  Snapshot,
-  Subscription,
-  Task,
-  Transaction,
-  Wallet,
-} from "./types";
+import type { Settings, Snapshot, Subscription, Task, Transaction } from "./types";
 
 /** Storage-agnostic persistence contract. Implemented by the SQLite adapter
  *  (desktop / Tauri) and the localStorage adapter (browser preview). */
@@ -15,9 +8,6 @@ export interface Database {
 
   putTransaction(tx: Transaction): Promise<void>;
   deleteTransaction(id: string): Promise<void>;
-
-  putWallet(w: Wallet): Promise<void>;
-  deleteWallet(id: string): Promise<void>;
 
   putSubscription(s: Subscription): Promise<void>;
   deleteSubscription(id: string): Promise<void>;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Download, Trash2, Database, ShieldCheck, Info, Sparkles, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Download, Trash2, Database, ShieldCheck, Info, Sparkles } from "lucide-react";
 import { useStore } from "../store/useStore";
 import { Panel, SectionTitle } from "../components/ui";
 import { Field, Select, TextInput } from "../components/ui/Field";
@@ -15,15 +15,13 @@ const CURRENCIES: { code: string; symbol: string }[] = [
 ];
 
 export function Settings() {
-  const { settings, saveSettings, resetAll, loadSample, transactions, wallets, subscriptions, tasks, usingSqlite } =
+  const { settings, saveSettings, resetAll, loadSample, transactions, subscriptions, tasks, usingSqlite } =
     useStore();
   const [name, setName] = useState(settings.displayName);
   const [currency, setCurrency] = useState(settings.currency);
-  const [alchemyKey, setAlchemyKey] = useState(settings.alchemyKey);
-  const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
-  const isEmpty = transactions.length === 0 && wallets.length === 0 && subscriptions.length === 0 && tasks.length === 0;
+  const isEmpty = transactions.length === 0 && subscriptions.length === 0 && tasks.length === 0;
 
   async function save() {
     const cur = CURRENCIES.find((c) => c.code === currency) ?? CURRENCIES[0];
@@ -31,14 +29,13 @@ export function Settings() {
       displayName: name.trim() || "Clank",
       currency: cur.code,
       currencySymbol: cur.symbol,
-      alchemyKey: alchemyKey.trim(),
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 1600);
   }
 
   function exportData() {
-    const payload = { version: 1, exportedAt: new Date().toISOString(), transactions, wallets, subscriptions, tasks, settings };
+    const payload = { version: 1, exportedAt: new Date().toISOString(), transactions, subscriptions, tasks, settings };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -75,45 +72,9 @@ export function Settings() {
       </Panel>
 
       <Panel>
-        <SectionTitle
-          title="Integrations"
-          subtitle="On-chain portfolio scanning (EVM)"
-          icon={<KeyRound size={16} />}
-        />
-        <Field
-          label="Alchemy API key"
-          hint="Powers the multi-chain token scan & P&L (Ethereum, Base, Arbitrum, Optimism, Polygon). Stored locally on this device only."
-        >
-          <div className="relative">
-            <TextInput
-              type={showKey ? "text" : "password"}
-              value={alchemyKey}
-              onChange={(e) => setAlchemyKey(e.target.value)}
-              placeholder="Paste your Alchemy key"
-              className="num pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowKey((v) => !v)}
-              aria-label={showKey ? "Hide key" : "Show key"}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--color-faint)] hover:text-[var(--color-fg)]"
-            >
-              {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
-            </button>
-          </div>
-        </Field>
-        <div className="mt-3">
-          <button className="btn btn-primary" onClick={save}>
-            Save key
-          </button>
-        </div>
-      </Panel>
-
-      <Panel>
         <SectionTitle title="Data" subtitle="Everything is stored locally on this device" icon={<Database size={16} />} />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-3">
           <Stat n={transactions.length} label="Transactions" />
-          <Stat n={wallets.length} label="Wallets" />
           <Stat n={subscriptions.length} label="Subscriptions" />
           <Stat n={tasks.length} label="Tasks" />
         </div>
@@ -147,7 +108,7 @@ export function Settings() {
           </p>
           <p>
             <b style={{ color: "var(--color-info)" }}>Transfers, withdrawals and deposits</b> move money between your
-            own accounts (e.g. Wallet → Binance). They are tracked as movements and never counted as new profit — so
+            own accounts (e.g. Checking → Savings). They are tracked as movements and never counted as new profit — so
             earnings are never double-counted.
           </p>
         </div>

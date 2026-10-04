@@ -16,7 +16,7 @@ export interface Totals {
   income: number;
   expenses: number;
   profit: number; // income - expenses
-  withdrawals: number; // money moved out (e.g. Wallet → Binance)
+  withdrawals: number; // money moved out (e.g. Checking → Savings)
   deposits: number;
   transfers: number; // internal movements
   count: number;

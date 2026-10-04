@@ -2,7 +2,6 @@ import SQL from "@tauri-apps/plugin-sql";
 import type { Database } from "./Database";
 import {
   DEFAULT_SETTINGS,
-  type Chain,
   type Frequency,
   type Recurrence,
   type Settings,
@@ -11,7 +10,6 @@ import {
   type Task,
   type Transaction,
   type TxType,
-  type Wallet,
 } from "./types";
 
 /** SQLite adapter backed by @tauri-apps/plugin-sql — the real store in the
@@ -39,21 +37,9 @@ export class SqliteDatabase implements Database {
         note TEXT NOT NULL DEFAULT '',
         from_account TEXT NOT NULL DEFAULT '',
         to_account TEXT NOT NULL DEFAULT '',
-        wallet_id TEXT,
         created_at INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_tx_date ON transactions(date);
-
-      CREATE TABLE IF NOT EXISTS wallets (
-        id TEXT PRIMARY KEY,
-        label TEXT NOT NULL,
-        chain TEXT NOT NULL,
-        address TEXT NOT NULL DEFAULT '',
-        balance REAL NOT NULL DEFAULT 0,
-        native_balance REAL,
-        synced_at INTEGER,
-        created_at INTEGER NOT NULL
-      );
 
       CREATE TABLE IF NOT EXISTS subscriptions (
         id TEXT PRIMARY KEY,
@@ -79,52 +65,15 @@ export class SqliteDatabase implements Database {
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
       );
-    `);
 
-    await this.fixWalletsSchema();
-  }
-
-  /** Older DBs added native_balance/synced_at via ALTER TABLE, which appended
-   *  them AFTER created_at. Because values bind by physical column position,
-   *  that shifted the sync fields into the wrong columns. Rebuild the table to
-   *  the canonical column order and un-shift the data (INSERT...SELECT is
-   *  positional, so the remap is exact). Idempotent: no-op once canonical. */
-  private async fixWalletsSchema() {
-    const info = await this.db.select<{ name: string }[]>("PRAGMA table_info(wallets)");
-    if (!info.length) return;
-    const order = info.map((c) => c.name).join(",");
-    const canonical = "id,label,chain,address,balance,native_balance,synced_at,created_at";
-    if (order === canonical) return;
-
-    const hasNative = info.some((c) => c.name === "native_balance");
-    // When native columns were ALTER-appended, legacy created_at holds the real
-    // native balance, legacy native_balance holds synced_at, legacy synced_at
-    // holds created_at — so remap those three; otherwise just carry safe columns.
-    const selectCols = hasNative
-      ? "id,label,chain,address,balance,created_at,native_balance,synced_at"
-      : "id,label,chain,address,balance,NULL,NULL,created_at";
-    await this.db.execute(`
-      CREATE TABLE wallets_fixed (
-        id TEXT PRIMARY KEY,
-        label TEXT NOT NULL,
-        chain TEXT NOT NULL,
-        address TEXT NOT NULL DEFAULT '',
-        balance REAL NOT NULL DEFAULT 0,
-        native_balance REAL,
-        synced_at INTEGER,
-        created_at INTEGER NOT NULL
-      );
-      INSERT INTO wallets_fixed (id,label,chain,address,balance,native_balance,synced_at,created_at)
-        SELECT ${selectCols} FROM wallets;
-      DROP TABLE wallets;
-      ALTER TABLE wallets_fixed RENAME TO wallets;
+      -- clean up the legacy crypto-wallet table if it exists
+      DROP TABLE IF EXISTS wallets;
     `);
   }
 
   async getSnapshot(): Promise<Snapshot> {
-    const [txs, wallets, subs, tasks, settingRows] = await Promise.all([
+    const [txs, subs, tasks, settingRows] = await Promise.all([
       this.db.select<any[]>("SELECT * FROM transactions ORDER BY date DESC, created_at DESC"),
-      this.db.select<any[]>("SELECT * FROM wallets ORDER BY created_at ASC"),
       this.db.select<any[]>("SELECT * FROM subscriptions ORDER BY next_payment ASC"),
       this.db.select<any[]>("SELECT * FROM tasks ORDER BY created_at ASC"),
       this.db.select<any[]>("SELECT * FROM settings"),
@@ -135,7 +84,6 @@ export class SqliteDatabase implements Database {
       if (r.key === "displayName") settings.displayName = r.value;
       if (r.key === "currency") settings.currency = r.value;
       if (r.key === "currencySymbol") settings.currencySymbol = r.value;
-      if (r.key === "alchemyKey") settings.alchemyKey = r.value;
     }
 
     return {
@@ -149,19 +97,7 @@ export class SqliteDatabase implements Database {
           note: r.note ?? "",
           fromAccount: r.from_account ?? "",
           toAccount: r.to_account ?? "",
-          walletId: r.wallet_id ?? null,
-          createdAt: r.created_at,
-        }),
-      ),
-      wallets: wallets.map(
-        (r): Wallet => ({
-          id: r.id,
-          label: r.label,
-          chain: r.chain as Chain,
-          address: r.address ?? "",
-          balance: r.balance ?? 0,
-          nativeBalance: r.native_balance ?? undefined,
-          syncedAt: r.synced_at ?? undefined,
+          walletId: null,
           createdAt: r.created_at,
         }),
       ),
@@ -193,27 +129,15 @@ export class SqliteDatabase implements Database {
 
   async putTransaction(t: Transaction) {
     await this.db.execute(
-      `INSERT INTO transactions (id,date,type,category,amount,note,from_account,to_account,wallet_id,created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      `INSERT INTO transactions (id,date,type,category,amount,note,from_account,to_account,created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
        ON CONFLICT(id) DO UPDATE SET
-         date=$2,type=$3,category=$4,amount=$5,note=$6,from_account=$7,to_account=$8,wallet_id=$9`,
-      [t.id, t.date, t.type, t.category, t.amount, t.note, t.fromAccount, t.toAccount, t.walletId, t.createdAt],
+         date=$2,type=$3,category=$4,amount=$5,note=$6,from_account=$7,to_account=$8`,
+      [t.id, t.date, t.type, t.category, t.amount, t.note, t.fromAccount, t.toAccount, t.createdAt],
     );
   }
   async deleteTransaction(id: string) {
     await this.db.execute("DELETE FROM transactions WHERE id=$1", [id]);
-  }
-
-  async putWallet(w: Wallet) {
-    await this.db.execute(
-      `INSERT INTO wallets (id,label,chain,address,balance,native_balance,synced_at,created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       ON CONFLICT(id) DO UPDATE SET label=$2,chain=$3,address=$4,balance=$5,native_balance=$6,synced_at=$7`,
-      [w.id, w.label, w.chain, w.address, w.balance, w.nativeBalance ?? null, w.syncedAt ?? null, w.createdAt],
-    );
-  }
-  async deleteWallet(id: string) {
-    await this.db.execute("DELETE FROM wallets WHERE id=$1", [id]);
   }
 
   async putSubscription(s: Subscription) {
@@ -245,7 +169,6 @@ export class SqliteDatabase implements Database {
       ["displayName", s.displayName],
       ["currency", s.currency],
       ["currencySymbol", s.currencySymbol],
-      ["alchemyKey", s.alchemyKey],
     ];
     for (const [key, value] of entries) {
       await this.db.execute(
@@ -258,7 +181,7 @@ export class SqliteDatabase implements Database {
 
   async clearAll() {
     await this.db.execute(
-      "DELETE FROM transactions; DELETE FROM wallets; DELETE FROM subscriptions; DELETE FROM tasks; DELETE FROM settings;",
+      "DELETE FROM transactions; DELETE FROM subscriptions; DELETE FROM tasks; DELETE FROM settings;",
     );
   }
 }

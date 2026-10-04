@@ -7,12 +7,9 @@ import {
   type Subscription,
   type Task,
   type Transaction,
-  type Wallet,
 } from "../lib/db/types";
 import type { TxType } from "../lib/db/types";
 import { setCurrencySymbol } from "../lib/format";
-import { getPrices, isValidAddress, nativeBalance } from "../lib/chain";
-import { evmNativeEthTotal } from "../lib/evm";
 
 export type View =
   | "dashboard"
@@ -28,7 +25,6 @@ interface State {
   usingSqlite: boolean;
   view: View;
   transactions: Transaction[];
-  wallets: Wallet[];
   subscriptions: Subscription[];
   tasks: Task[];
   settings: Settings;
@@ -43,12 +39,6 @@ interface State {
 
   saveTransaction: (t: Transaction) => Promise<void>;
   removeTransaction: (id: string) => Promise<void>;
-
-  saveWallet: (w: Wallet) => Promise<void>;
-  removeWallet: (id: string) => Promise<void>;
-  /** fetch live on-chain balances for all wallets with a supported address */
-  syncing: boolean;
-  syncWallets: () => Promise<{ synced: number; failed: number; skipped: number }>;
 
   saveSubscription: (s: Subscription) => Promise<void>;
   removeSubscription: (id: string) => Promise<void>;
@@ -75,7 +65,6 @@ export const useStore = create<State>((set, get) => ({
   usingSqlite: false,
   view: "dashboard",
   transactions: [],
-  wallets: [],
   subscriptions: [],
   tasks: [],
   settings: { ...DEFAULT_SETTINGS },
@@ -93,7 +82,6 @@ export const useStore = create<State>((set, get) => ({
         ready: true,
         usingSqlite: "__TAURI_INTERNALS__" in window,
         transactions: [...snap.transactions].sort(sortTx),
-        wallets: snap.wallets,
         subscriptions: snap.subscriptions,
         tasks: snap.tasks,
         settings: snap.settings,
@@ -112,70 +100,6 @@ export const useStore = create<State>((set, get) => ({
   removeTransaction: async (id) => {
     await db.deleteTransaction(id);
     set({ transactions: get().transactions.filter((x) => x.id !== id) });
-  },
-
-  saveWallet: async (w) => {
-    await db.putWallet(w);
-    const rest = get().wallets.filter((x) => x.id !== w.id);
-    set({ wallets: [...rest, w].sort((a, b) => a.createdAt - b.createdAt) });
-  },
-  removeWallet: async (id) => {
-    await db.deleteWallet(id);
-    set({ wallets: get().wallets.filter((x) => x.id !== id) });
-  },
-
-  syncing: false,
-  syncWallets: async () => {
-    const wallets = get().wallets;
-    if (!wallets.length) return { synced: 0, failed: 0, skipped: 0 };
-    set({ syncing: true });
-    let synced = 0;
-    let failed = 0;
-    let skipped = 0;
-    try {
-      let prices: Awaited<ReturnType<typeof getPrices>> = {};
-      try {
-        prices = await getPrices();
-      } catch {
-        /* prices optional — native balance still updates */
-      }
-      const apiKey = get().settings.alchemyKey?.trim();
-      for (const w of wallets) {
-        if (w.chain === "OTHER" || !isValidAddress(w.chain, w.address)) {
-          skipped++;
-          continue;
-        }
-        try {
-          let nativeBal: number;
-          let usd: number | null;
-          if (w.chain === "ETH" && apiKey) {
-            // total native ETH across Ethereum, Base, Arbitrum, Optimism & Robinhood
-            const r = await evmNativeEthTotal(apiKey, w.address);
-            nativeBal = r.eth;
-            usd = r.usd;
-          } else {
-            const native = await nativeBalance(w.chain, w.address);
-            const price = prices[w.chain];
-            nativeBal = native;
-            usd = price != null ? native * price : null;
-          }
-          const updated: Wallet = {
-            ...w,
-            nativeBalance: nativeBal,
-            balance: usd != null ? usd : w.balance,
-            syncedAt: Date.now(),
-          };
-          await db.putWallet(updated);
-          set({ wallets: get().wallets.map((x) => (x.id === w.id ? updated : x)) });
-          synced++;
-        } catch {
-          failed++;
-        }
-      }
-    } finally {
-      set({ syncing: false });
-    }
-    return { synced, failed, skipped };
   },
 
   saveSubscription: async (s) => {
@@ -217,7 +141,7 @@ export const useStore = create<State>((set, get) => ({
     const settings = get().settings;
     await db.clearAll();
     await db.putSettings(settings);
-    set({ transactions: [], wallets: [], subscriptions: [], tasks: [], settings });
+    set({ transactions: [], subscriptions: [], tasks: [], settings });
   },
 
   loadSample: async () => {
@@ -226,7 +150,6 @@ export const useStore = create<State>((set, get) => ({
     await db.putSettings(settings);
     set({
       transactions: [...snap.transactions].sort(sortTx),
-      wallets: snap.wallets,
       subscriptions: snap.subscriptions,
       tasks: snap.tasks,
     });

@@ -43,7 +43,7 @@ export async function seedDemo(db: Database): Promise<Snapshot> {
 
   // ~45 days of pseudo-random but plausible income + expenses
   const incomeSources: [string, number][] = [
-    ["NFT / Art", 120],
+    ["Freelance", 120],
     ["Trading", 80],
     ["Freelance", 50],
   ];
@@ -58,7 +58,7 @@ export async function seedDemo(db: Database): Promise<Snapshot> {
       addTx({ date: d, type: "income", category: cat, amount: amt, note: `${cat} earnings` });
     }
     if (r > 0.75) {
-      addTx({ date: d, type: "income", category: "Trading", amount: Math.round(60 + r * 140), note: "Trade profit" });
+      addTx({ date: d, type: "income", category: "Trading", amount: Math.round(60 + r * 140), note: "Side gig" });
     }
     // occasional expense
     if (r < 0.3) {
@@ -67,20 +67,20 @@ export async function seedDemo(db: Database): Promise<Snapshot> {
   }
 
   // explicit recent entries that mirror the spec examples
-  addTx({ date: iso(today), type: "income", category: "NFT / Art", amount: 120, note: "Drop sale" });
-  addTx({ date: iso(today), type: "income", category: "Trading", amount: 80, note: "Scalp" });
+  addTx({ date: iso(today), type: "income", category: "Business", amount: 120, note: "Client invoice" });
+  addTx({ date: iso(today), type: "income", category: "Salary", amount: 80, note: "Bonus" });
   addTx({ date: iso(today), type: "expense", category: "Subscription", amount: 20, note: "ChatGPT" });
 
-  // THE accounting-rule demo: a trading profit, then a withdrawal of the same
-  // amount to Binance. Profit counts once; the withdrawal is a movement, not income.
-  addTx({ date: iso(daysAgo(2)), type: "income", category: "Trading", amount: 300, note: "Position closed" });
+  // THE accounting-rule demo: income, then a withdrawal of the same amount to
+  // savings. Profit counts once; the withdrawal is a movement, not income.
+  addTx({ date: iso(daysAgo(2)), type: "income", category: "Freelance", amount: 300, note: "Project paid" });
   addTx({
     date: iso(daysAgo(1)),
     type: "withdrawal",
     category: "Withdrawal",
     amount: 300,
-    fromAccount: "Wallet A",
-    toAccount: "Binance",
+    fromAccount: "Checking",
+    toAccount: "Savings",
     note: "Secured profit",
   });
   addTx({
@@ -88,8 +88,8 @@ export async function seedDemo(db: Database): Promise<Snapshot> {
     type: "withdrawal",
     category: "Withdrawal",
     amount: 500,
-    fromAccount: "Wallet A",
-    toAccount: "Binance",
+    fromAccount: "Checking",
+    toAccount: "Savings",
     note: "Cash out",
   });
   addTx({
@@ -97,19 +97,12 @@ export async function seedDemo(db: Database): Promise<Snapshot> {
     type: "transfer",
     category: "Transfer",
     amount: 1100,
-    fromAccount: "Wallet B",
-    toAccount: "Wallet A",
+    fromAccount: "Cash",
+    toAccount: "Checking",
     note: "Consolidate",
   });
 
   for (const t of txs) await db.putTransaction(t);
-
-  const wallets = [
-    { id: uid(), label: "Main ETH", chain: "ETH" as const, address: "0x1a2b3c4d5e6f7890abcdef1234567890abcdef12", balance: 4281, createdAt: Date.now() },
-    { id: uid(), label: "Cold BTC", chain: "BTC" as const, address: "bc1q9xyz0a1b2c3d4e5f6g7h8i9j0klmno", balance: 1920, createdAt: Date.now() + 1 },
-    { id: uid(), label: "Sol Trading", chain: "SOL" as const, address: "7Np41oeYqPefeNQEHSv1UDhYrehxin3NStELsSKCT4K2", balance: 860, createdAt: Date.now() + 2 },
-  ];
-  for (const w of wallets) await db.putWallet(w);
 
   const subs = [
     { name: "Spotify", amount: 10.99, frequency: "monthly" as const, category: "Music", offset: 14 },

@@ -27,27 +27,11 @@ export interface Transaction {
   category: string;
   amount: number; // always stored positive; sign is derived from `type`
   note: string;
-  /** source account/wallet label, e.g. "Wallet A", for transfers/withdrawals */
+  /** source account/wallet label, for transfers/withdrawals */
   fromAccount: string;
-  /** destination, e.g. "Binance" */
+  /** destination, e.g. "Savings" */
   toAccount: string;
   walletId: string | null;
-  createdAt: number;
-}
-
-export type Chain = "ETH" | "BTC" | "SOL" | "OTHER";
-
-export interface Wallet {
-  id: string;
-  label: string;
-  chain: Chain;
-  address: string;
-  /** balance in USD — entered manually, or set by an on-chain sync */
-  balance: number;
-  /** native-coin balance from the last on-chain sync (e.g. 0.42 ETH) */
-  nativeBalance?: number;
-  /** epoch ms of the last successful on-chain sync */
-  syncedAt?: number;
   createdAt: number;
 }
 
@@ -82,13 +66,10 @@ export interface Settings {
   displayName: string;
   currency: string; // ISO code e.g. "USD"
   currencySymbol: string;
-  /** Alchemy API key for multi-chain EVM portfolio scans (stored locally) */
-  alchemyKey: string;
 }
 
 export interface Snapshot {
   transactions: Transaction[];
-  wallets: Wallet[];
   subscriptions: Subscription[];
   tasks: Task[];
   settings: Settings;
@@ -98,15 +79,14 @@ export const DEFAULT_SETTINGS: Settings = {
   displayName: "Clank",
   currency: "USD",
   currencySymbol: "$",
-  alchemyKey: "",
 };
 
 export const INCOME_CATEGORIES = [
-  "Trading",
-  "NFT / Art",
-  "Freelance",
   "Salary",
-  "Staking",
+  "Freelance",
+  "Business",
+  "Investments",
+  "Trading",
   "Other",
 ];
 export const EXPENSE_CATEGORIES = [
