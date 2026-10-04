@@ -1,9 +1,9 @@
 {
-  "name": "clankos",
+  "name": "fintrack",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "ClankOS — personal finance, crypto & productivity command center",
+  "description": "FinTrack — a local-first personal finance & productivity tracker (desktop app)",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

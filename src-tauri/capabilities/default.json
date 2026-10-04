@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Core permissions for the ClankOS main window, including local SQLite access.",
+  "description": "Core permissions for the FinTrack main window, including local SQLite access.",
   "windows": ["main"],
   "permissions": [
     "core:default",

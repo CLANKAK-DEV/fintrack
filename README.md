@@ -1,4 +1,4 @@
-# ClankOS — Personal Finance & Productivity Command Center
+# FinTrack — Personal Finance & Productivity Command Center
 
 A clean, **local-first desktop app** to track the money you make and spend, your subscriptions, tasks, and daily/monthly analytics — all from one dark, modern dashboard. Everything is stored **offline on your own computer**.
 
@@ -28,7 +28,7 @@ Built with **Tauri 2 · React · TypeScript · Vite · Tailwind CSS v4** and a l
 
 Grab the latest installer from the [**Releases**](../../releases) page and run it:
 
-- **Windows:** `ClankOS_x.x.x_x64-setup.exe` → double-click → Next → Finish. Launch from the Start Menu.
+- **Windows:** `FinTrack_x.x.x_x64-setup.exe` → double-click → Next → Finish. Launch from the Start Menu.
 
 That's it. The app runs fully offline; your data stays on your machine.
 
@@ -49,8 +49,8 @@ That's it. The app runs fully offline; your data stays on your machine.
 ### 2. Get the code & install
 
 ```bash
-git clone https://github.com/<your-username>/clankos.git
-cd clankos
+git clone https://github.com/<your-username>/fintrack.git
+cd fintrack
 npm install
 ```
 
@@ -84,9 +84,9 @@ src-tauri/target/release/bundle/
 
 Everything is saved in a single local **SQLite** file — nothing is ever uploaded:
 
-- **Windows:** `%APPDATA%\com.clankos.app\clankos.db`
-- **macOS:** `~/Library/Application Support/com.clankos.app/clankos.db`
-- **Linux:** `~/.config/com.clankos.app/clankos.db`
+- **Windows:** `%APPDATA%\com.fintrack.app\fintrack.db`
+- **macOS:** `~/Library/Application Support/com.fintrack.app/fintrack.db`
+- **Linux:** `~/.config/com.fintrack.app/fintrack.db`
 
 You can back it up any time from **Settings → Export backup (JSON)**.
 
@@ -118,4 +118,4 @@ In the browser it uses `localStorage`; in the packaged desktop app it uses **SQL
 
 ---
 
-Made with ClankOS. Contributions and ideas welcome — open an issue or a pull request.
+Made with FinTrack. Contributions and ideas welcome — open an issue or a pull request.

@@ -76,7 +76,7 @@ export interface Snapshot {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  displayName: "Clank",
+  displayName: "",
   currency: "USD",
   currencySymbol: "$",
 };

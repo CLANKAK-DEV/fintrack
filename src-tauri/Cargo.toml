@@ -1,12 +1,12 @@
 [package]
-name = "clankos"
+name = "fintrack"
 version = "1.0.0"
-description = "ClankOS — personal finance, crypto & productivity command center"
-authors = ["Clank"]
+description = "FinTrack — personal finance & productivity tracker"
+authors = ["FinTrack"]
 edition = "2021"
 
 [lib]
-name = "clankos_lib"
+name = "fintrack_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

@@ -32,7 +32,12 @@ export function Topbar() {
       <div>
         {view === "dashboard" ? (
           <h1 className="text-xl font-bold tracking-tight">
-            {greeting()}, <span style={{ color: "var(--color-primary)" }}>{name}</span>
+            {greeting()}
+            {name.trim() && (
+              <>
+                , <span style={{ color: "var(--color-primary)" }}>{name}</span>
+              </>
+            )}
           </h1>
         ) : (
           <h1 className="text-xl font-bold tracking-tight">{TITLES[view]}</h1>

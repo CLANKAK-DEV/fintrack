@@ -39,8 +39,8 @@ export function upcomingReminders(subs: Subscription[], within = REMINDER_WINDOW
 }
 
 /* ---------- desktop notification preferences & dedup ---------- */
-const ENABLED_KEY = "clankos:notify:enabled";
-const SENT_KEY = "clankos:notify:sent";
+const ENABLED_KEY = "fintrack:notify:enabled";
+const SENT_KEY = "fintrack:notify:sent";
 
 export function notificationsEnabled(): boolean {
   try {

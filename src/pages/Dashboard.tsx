@@ -87,7 +87,7 @@ export function Dashboard() {
               <path d="M8 6 L4 12 L8 18 M16 6 L20 12 L16 18" stroke="#1a1206" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold tracking-tight">Welcome to ClankOS</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Welcome to FinTrack</h2>
           <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[var(--color-muted)]">
             Your command center is empty and ready. Add your first entry to start tracking income, expenses,
             profit, subscriptions and tasks — or load sample data to explore first.

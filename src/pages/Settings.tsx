@@ -26,7 +26,7 @@ export function Settings() {
   async function save() {
     const cur = CURRENCIES.find((c) => c.code === currency) ?? CURRENCIES[0];
     await saveSettings({
-      displayName: name.trim() || "Clank",
+      displayName: name.trim(),
       currency: cur.code,
       currencySymbol: cur.symbol,
     });
@@ -40,7 +40,7 @@ export function Settings() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `clankos-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `fintrack-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -115,7 +115,7 @@ export function Settings() {
       </Panel>
 
       <div className="flex items-center justify-center gap-2 pb-4 text-xs text-[var(--color-faint)]">
-        <span className="font-display font-bold">ClankOS</span> · v1.0 · built for Clank
+        <span className="font-display font-bold">FinTrack</span> · v1.0 · local-first & offline
       </div>
 
       <Modal

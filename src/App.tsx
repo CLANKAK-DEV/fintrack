@@ -122,7 +122,7 @@ function Splash() {
           </svg>
         </div>
         <div className="text-center">
-          <div className="font-display text-lg font-bold">ClankOS</div>
+          <div className="font-display text-lg font-bold">FinTrack</div>
           <div className="text-xs text-[var(--color-faint)]">Loading your command center…</div>
         </div>
       </div>

@@ -52,8 +52,8 @@ export function TitleBar() {
         >
           <Command size={11} color="#1a1206" strokeWidth={3} />
         </span>
-        <span className="font-display text-xs font-semibold tracking-tight text-[var(--color-fg)]">ClankOS</span>
-        <span className="text-[10px] text-[var(--color-faint)]">Command Center</span>
+        <span className="font-display text-xs font-semibold tracking-tight text-[var(--color-fg)]">FinTrack</span>
+        <span className="text-[10px] text-[var(--color-faint)]">Finance Tracker</span>
       </div>
 
       {/* window controls */}

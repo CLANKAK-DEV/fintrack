@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ClankOS",
+  "productName": "FinTrack",
   "version": "1.0.0",
-  "identifier": "com.clankos.app",
+  "identifier": "com.fintrack.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "ClankOS",
+        "title": "FinTrack",
         "width": 1320,
         "height": 860,
         "minWidth": 1040,
@@ -40,7 +40,7 @@
       "icons/icon.ico"
     ],
     "category": "Finance",
-    "shortDescription": "Personal finance, crypto & productivity command center",
-    "longDescription": "ClankOS is a local-first desktop command center for tracking daily earnings, profit & loss, crypto wallets, subscriptions, tasks and analytics — with accounting-grade separation of profit from transfers and withdrawals."
+    "shortDescription": "Personal finance & productivity tracker",
+    "longDescription": "FinTrack is a local-first desktop command center for tracking income, expenses, profit, subscriptions, tasks and analytics — fully offline, with accounting-grade separation of profit from transfers and withdrawals."
   }
 }

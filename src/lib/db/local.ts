@@ -8,7 +8,7 @@ import {
   type Transaction,
 } from "./types";
 
-const KEY = "clankos:db:v1";
+const KEY = "fintrack:db:v1";
 
 function empty(): Snapshot {
   return {

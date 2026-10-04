@@ -18,7 +18,7 @@ export class SqliteDatabase implements Database {
   private db!: Awaited<ReturnType<typeof SQL.load>>;
 
   async init(): Promise<void> {
-    this.db = await SQL.load("sqlite:clankos.db");
+    this.db = await SQL.load("sqlite:fintrack.db");
     // Durability: write every commit straight to the main DB file (no separate
     // write-ahead file that could be lost if the app is closed abruptly).
     try {
